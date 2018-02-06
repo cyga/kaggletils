@@ -4,7 +4,7 @@
 """
 
 import abc
-import copy_reg
+import copyreg
 import types
 from datetime import datetime
 from multiprocessing import Pool
@@ -23,7 +23,7 @@ def __pickle_method(m):
         return getattr, (m.im_self, m.im_func.func_name)
 
 
-copy_reg.pickle(types.MethodType, __pickle_method)
+copyreg.pickle(types.MethodType, __pickle_method)
 
 
 class CrossValidatorClfBase:
@@ -111,14 +111,14 @@ class CrossValidator(object):
 
         if self.verbose:
             if x_test is None and x_probe is None:
-                print 'CrossValidator: X_train: {0}'.format(x_train.shape)
+                print('CrossValidator: X_train: {0}'.format(x_train.shape))
             elif x_test is not None and x_probe is None:
-                print 'CrossValidator: X_train: {0}, X_test: {1}'.format(x_train.shape, x_test.shape)
+                print('CrossValidator: X_train: {0}, X_test: {1}'.format(x_train.shape, x_test.shape))
             elif x_test is None and x_probe is not None:
-                print 'CrossValidator: X_train: {0}, X_probe: {1}'.format(x_train.shape, x_probe.shape)
+                print('CrossValidator: X_train: {0}, X_probe: {1}'.format(x_train.shape, x_probe.shape))
             else:
-                print 'CrossValidator: X_train: {0}, X_test: {1}, X_probe: {2}'. \
-                    format(x_train.shape, x_test.shape, x_probe.shape)
+                print('CrossValidator: X_train: {0}, X_test: {1}, X_probe: {2}'. \
+                    format(x_train.shape, x_test.shape, x_probe.shape))
 
         if subset_column is None:
             self.__run_cv(x_train, y_train, x_test, x_probe, y_probe, sample_weights, ccv_features)
@@ -138,8 +138,8 @@ class CrossValidator(object):
         cv_scores_probe_weights = []
 
         if self.verbose:
-            print '{0} Subsets (subset column: {1}, subset values: {2})' \
-                .format(len(subset_values), subset_column, subset_values)
+            print('{0} Subsets (subset column: {1}, subset values: {2})' \
+                .format(len(subset_values), subset_column, subset_values))
 
         for val in subset_values:
             train_ix = np.in1d(x_train[:, subset_column], val)
@@ -153,11 +153,11 @@ class CrossValidator(object):
             weights_sub = sample_weights[train_ix] if sample_weights is not None else None
             if self.verbose:
                 if self.ntest > 0:
-                    print 'Subset CV (column: {0}, value: {1}, ntrain: {2}, ntest: {3})' \
-                        .format(subset_column, val, x_train_sub.shape[0], x_test_sub.shape[0])
+                    print('Subset CV (column: {0}, value: {1}, ntrain: {2}, ntest: {3})' \
+                        .format(subset_column, val, x_train_sub.shape[0], x_test_sub.shape[0]))
                 else:
-                    print 'Subset CV (column: {0}, value: {1}, ntrain: {2})' \
-                        .format(subset_column, val, x_train_sub.shape[0])
+                    print('Subset CV (column: {0}, value: {1}, ntrain: {2})' \
+                        .format(subset_column, val, x_train_sub.shape[0]))
             self.folds = None
             self.__run_cv(x_train_sub, y_train_sub, x_test_sub, x_probe_sub, y_probe_sub, weights_sub)
             oof_train[train_ix] = self.oof_train
@@ -197,9 +197,9 @@ class CrossValidator(object):
             self.mean_test = self.mean_test[0] if self.ntest > 0 else None
 
         if self.verbose:
-            print 'CV-Mean: {0:.12f}'.format(self.cv_mean)
-            print 'CV-Std:  {0:.12f}'.format(self.cv_std)
-            print 'Runtime: {0}'.format(elapsed_time)
+            print('CV-Mean: {0:.12f}'.format(self.cv_mean))
+            print('CV-Std:  {0:.12f}'.format(self.cv_std))
+            print('Runtime: {0}'.format(elapsed_time))
 
     def __run_cv(self, x_train, y_train, x_test=None, x_probe=None, y_probe=None, sample_weights=None,
                  ccv_features=None):
@@ -236,10 +236,10 @@ class CrossValidator(object):
         cv_scores_probe = []
 
         if self.verbose:
-            print prefix + '{0} Fold CV (seed: {1}, stratified: {2}, nbags: {3}, ' \
+            print(prefix + '{0} Fold CV (seed: {1}, stratified: {2}, nbags: {3}, ' \
                            'subsample: {4}, bootstrap: {5}, shuffle: {6}, average oof: {7})' \
                 .format(self.nfolds, self.seed, self.stratified, self.nbags,
-                        self.subsample, self.bootstrap, self.shuffle, self.average_oof)
+                        self.subsample, self.bootstrap, self.shuffle, self.average_oof))
 
         if self.nfolds > 1:
             ts_cv = datetime.now()
@@ -257,8 +257,8 @@ class CrossValidator(object):
                         else sparse.hstack((x_valid_oof, ccv_features[1][i].reshape(x_valid_oof.shape[0], -1)), format='csr')
 
                 if self.verbose:
-                    print prefix + 'Fold {0:02d}: X_train: {1}, X_valid: {2}'. \
-                        format(i + 1, x_train_oof.shape, x_valid_oof.shape)
+                    print(prefix + 'Fold {0:02d}: X_train: {1}, X_valid: {2}'. \
+                        format(i + 1, x_train_oof.shape, x_valid_oof.shape))
 
                 ntrain_oof = x_train_oof.shape[0]
                 nvalid_oof = x_valid_oof.shape[0]
@@ -298,13 +298,13 @@ class CrossValidator(object):
 
                 te_fold = datetime.now()
                 if self.verbose:
-                    print prefix + u'         {0:.12f} ({1:.8f} ± {2:.8f})'. \
-                        format(scr, np.mean(cv_scores), np.std(cv_scores))
+                    print(prefix + u'         {0:.12f} ({1:.8f} ± {2:.8f})'. \
+                        format(scr, np.mean(cv_scores), np.std(cv_scores)))
                 if self.verbose and nprobe > 0:
-                    print prefix + u'         {0:.12f} ({1:.8f} ± {2:.8f})'. \
-                        format(scr_probe, np.mean(cv_scores_probe), np.std(cv_scores_probe))
+                    print(prefix + u'         {0:.12f} ({1:.8f} ± {2:.8f})'. \
+                        format(scr_probe, np.mean(cv_scores_probe), np.std(cv_scores_probe)))
                 if self.verbose:
-                    print prefix + '         {0}'.format(te_fold - ts_fold)
+                    print(prefix + '         {0}'.format(te_fold - ts_fold))
             te_cv = datetime.now()
         else:
             ts_cv = te_cv = datetime.now()
@@ -331,12 +331,12 @@ class CrossValidator(object):
                         else sparse.hstack((x_train, ccv_features[0][-1].reshape(x_train.shape[0], -1)), format='csr')
 
                 if self.verbose and self.nfolds > 1:
-                    print prefix + 'CV-Mean: {0:.12f}'.format(self.cv_mean)
-                    print prefix + 'CV-Std:  {0:.12f}'.format(self.cv_std)
-                    print prefix + 'Runtime: {0}'.format((te_cv - ts_cv))
+                    print(prefix + 'CV-Mean: {0:.12f}'.format(self.cv_mean))
+                    print(prefix + 'CV-Std:  {0:.12f}'.format(self.cv_std))
+                    print(prefix + 'Runtime: {0}'.format((te_cv - ts_cv)))
                 if self.verbose:
-                    print prefix + 'OnePass: X_train: {0}, X_test: {1}'. \
-                        format(x_train.shape, x_test.shape)
+                    print(prefix + 'OnePass: X_train: {0}, X_test: {1}'. \
+                        format(x_train.shape, x_test.shape))
 
                 oof_bag_test = np.empty((self.nbags, ntest, self.pdim))
                 oof_bag_probe = np.empty((self.nbags, nprobe, self.pdim))
@@ -375,29 +375,29 @@ class CrossValidator(object):
 
         if self.verbose:
             if self.average_oof:
-                print prefix + 'CV-Mean: {0:.12f}'.format(self.cv_mean)
-                print prefix + 'CV-Std:  {0:.12f}'.format(self.cv_std)
+                print(prefix + 'CV-Mean: {0:.12f}'.format(self.cv_mean))
+                print(prefix + 'CV-Std:  {0:.12f}'.format(self.cv_std))
             if self.nprobe > 0:
-                print prefix + 'Holdout: {0:.12f}'.format(self.probe_score)
-            print prefix + 'Runtime: {0}'.format(elapsed_time)
+                print(prefix + 'Holdout: {0:.12f}'.format(self.probe_score))
+            print(prefix + 'Runtime: {0}'.format(elapsed_time))
 
             # if self.verbose:
             #     for k in range(self.nfolds):
-            #         print prefix + 'Fold {0:02d}: {1:.12f}'.format(k + 1, self.cv_scores[k])
-            #     print prefix + 'CV-Mean: {0:.12f}'.format(self.cv_mean)
-            #     print prefix + 'CV-Std:  {0:.12f}'.format(self.cv_std)
-            #     print prefix + 'Runtime: {0}'.format(elapsed_time)
+            #         print(prefix + 'Fold {0:02d}: {1:.12f}'.format(k + 1, self.cv_scores[k]))
+            #     print(prefix + 'CV-Mean: {0:.12f}'.format(self.cv_mean))
+            #     print(prefix + 'CV-Std:  {0:.12f}'.format(self.cv_std))
+            #     print(prefix + 'Runtime: {0}'.format(elapsed_time))
 
     def print_cv_summary(self):
         if self.cv_scores is None:
             return
         for k in range(self.nfolds):
-            print 'Fold {0:02d}: {1:.12f}'.format(k + 1, self.cv_scores[k])
-        print 'CV-Mean: {0:.12f}'.format(self.cv_mean)
-        print 'CV-Std:  {0:.12f}'.format(self.cv_std)
+            print('Fold {0:02d}: {1:.12f}'.format(k + 1, self.cv_scores[k]))
+        print('CV-Mean: {0:.12f}'.format(self.cv_mean))
+        print('CV-Std:  {0:.12f}'.format(self.cv_std))
         if self.nprobe > 0:
-            print 'Holdout: {0:.12f}'.format(self.probe_score)
-        print 'Runtime: {0}'.format(self.elapsed_time)
+            print('Holdout: {0:.12f}'.format(self.probe_score))
+        print('Runtime: {0}'.format(self.elapsed_time))
 
     @property
     def oof_predictions(self):
@@ -478,9 +478,9 @@ class CrossValidatorMT(object):
 
         if self.verbose:
             if x_test is None:
-                print 'CrossValidatorMT {0}'.format(x_train.shape)
+                print('CrossValidatorMT {0}'.format(x_train.shape))
             else:
-                print 'CrossValidatorMT {0} {1}'.format(x_train.shape, x_test.shape)
+                print('CrossValidatorMT {0} {1}'.format(x_train.shape, x_test.shape))
 
         pool = Pool(processes=self.nfolds)
 
@@ -502,8 +502,8 @@ class CrossValidatorMT(object):
         cv_scores = []
 
         if self.verbose:
-            print '{0} Fold CV (seed: {1}, stratified: {2}, nbags: {3}, average oof: {4})' \
-                .format(self.nfolds, self.seed, self.stratified, self.nbags, self.average_oof)
+            print('{0} Fold CV (seed: {1}, stratified: {2}, nbags: {3}, average oof: {4})' \
+                .format(self.nfolds, self.seed, self.stratified, self.nbags, self.average_oof))
 
         ts_fold = datetime.now()
         folds_oof = pool.map(self._process_fold, folds)
@@ -514,7 +514,7 @@ class CrossValidatorMT(object):
 
             scr = self.metric(y_valid_oof, folds_oof[i][0])
             if self.verbose:
-                print 'Fold {0:02d}: {1:.12f} ({2})'.format(i + 1, scr, (te_fold - ts_fold))
+                print('Fold {0:02d}: {1:.12f} ({2})'.format(i + 1, scr, (te_fold - ts_fold)))
 
             cv_scores.append(scr)
             oof_train[valid_index, :] = folds_oof[i][0]
@@ -545,9 +545,9 @@ class CrossValidatorMT(object):
         self.mean_test = np.mean(oof_test, axis=0) if self.ntest > 0 else None
 
         if self.verbose:
-            print 'CV-Mean: {0:.12f}'.format(self.cv_mean)
-            print 'CV-Std:  {0:.12f}'.format(self.cv_std)
-            print 'Runtime: {0}'.format(elapsed_time)
+            print('CV-Mean: {0:.12f}'.format(self.cv_mean))
+            print('CV-Std:  {0:.12f}'.format(self.cv_std))
+            print('Runtime: {0}'.format(elapsed_time))
 
     def _process_fold(self, fold):
         train_ix, valid_ix = fold

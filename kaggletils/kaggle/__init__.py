@@ -3,7 +3,7 @@
 @author: Mathias Müller | Faron - kaggle.com/mmueller
 """
 
-from ranking import *
+from .ranking import *
 
 
 # __all__ = []

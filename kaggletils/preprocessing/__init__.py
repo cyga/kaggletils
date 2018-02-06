@@ -3,7 +3,7 @@
 @author: Mathias Müller | Faron - kaggle.com/mmueller
 """
 
-from encoders import *
+from .encoders import *
 
 
 # __all__ = []
